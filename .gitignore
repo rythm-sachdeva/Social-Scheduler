@@ -1,0 +1,11 @@
+**.env
+!.env.example
+!.env.local.example
+
+**.sqlite**
+/storage/*.key
+/storage/debugbar/*
+
+__pycache__/
+*.pyc
+
