@@ -11,9 +11,16 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'))
+
+LINKED_IN_CLIENT_ID = env('LINKEDIN_CLIENT_ID')
+LINKED_IN_CLIENT_SECRET = env('LINKEDIN_CLIENT_SECRET')
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,12 +38,24 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'customauth',
+    'rest_framework',
+    "rest_framework_simplejwt",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.linkedin_oauth2',
+    'django.contrib.sites', 
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'rest_framework.authtoken'
+
 ]
 
 MIDDLEWARE = [
@@ -47,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'social_scheduler.urls'
@@ -77,6 +97,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,
+    'REGISTER_SERIALIZER': 'customauth.serialiser.CustomRegisterSerialiser',
 }
 
 
@@ -110,6 +136,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -120,3 +152,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'linkedin_oauth2': {
+        'APP': {
+            'client_id': LINKED_IN_CLIENT_ID,
+            'secret': LINKED_IN_CLIENT_SECRET,
+        },
+        'SCOPE': [
+            'r_liteprofile',
+            'r_emailaddress',
+            'w_member_social',
+            'offline_access',  
+        ],
+        'PROFILE_FIELDS': [
+            'id', 'first-name', 'last-name', 'email-address',
+            'picture-url', 'public-profile-url',
+        ]
+    }
+}
