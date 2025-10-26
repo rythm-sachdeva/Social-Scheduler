@@ -57,8 +57,6 @@ def _refresh_linkedin_token(social_account: SocialAccount) -> SocialToken:
             raise LinkedInAPIError(f"Failed to refresh token: {response.status_code} - {response.text}")
 
         data = response.json()
-        
-        # Update the token in the database with the new values from LinkedIn
         social_token.token = data['access_token']
         social_token.expires_at = timezone.now() + timedelta(seconds=data['expires_in'])
         
@@ -77,7 +75,7 @@ def _get_linkedin_api_headers(social_account: SocialAccount) -> dict:
     return {
         "Authorization": f"Bearer {valid_token.token}",
         "X-Restli-Protocol-Version": "2.0.0",
-        "LinkedIn-Version": "202305" # It's good practice to pin to a recent API version
+        "LinkedIn-Version": "202305" 
     }
 
 

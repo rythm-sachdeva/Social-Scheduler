@@ -21,6 +21,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'))
 
 LINKED_IN_CLIENT_ID = env('LINKEDIN_CLIENT_ID')
 LINKED_IN_CLIENT_SECRET = env('LINKEDIN_CLIENT_SECRET')
+LINKED_IN_REFERESH_TOKEN_LINK = env('LINKEDIN_REFRESH_TOKEN_LINK')
 
 
 # Quick-start development settings - unsuitable for production
@@ -54,13 +55,19 @@ INSTALLED_APPS = [
     'django.contrib.sites', 
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'corsheaders',
 
+]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your React app's origin
+    "http://127.0.0.1:5173",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -139,7 +146,8 @@ USE_TZ = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'LOGIN_METHOD': ['email', 'username'],
 }
 
 
@@ -173,5 +181,16 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of 'allauth'
+    'django.contrib.auth.backends.ModelBackend',
+
+    # 'allauth' specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_LOGIN_METHODS = ['email','username'] 
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_UNIQUE_EMAIL = True
