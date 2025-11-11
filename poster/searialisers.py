@@ -29,7 +29,7 @@ class SocialAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialAccount
         fields = ['id', 'provider', 'uid', 'username']
-        read_only_fields = ['id', 'provider', 'uid', 'username']
+        read_only_fields = ['id', 'provider', 'uid', 'username'] 
 
 
 

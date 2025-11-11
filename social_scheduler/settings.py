@@ -57,11 +57,14 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
     'corsheaders',
+    'poster'
 
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your React app's origin
     "http://127.0.0.1:5173",
+    "http://192.168.0.8:8081",
+    "http://localhost:8081",
 ]
 
 MIDDLEWARE = [
