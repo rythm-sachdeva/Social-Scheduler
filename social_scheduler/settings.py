@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.linkedin_oauth2',
+    'allauth.socialaccount.providers.openid_connect',
     'django.contrib.sites', 
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -166,20 +166,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 SOCIALACCOUNT_PROVIDERS = {
-    'linkedin_oauth2': {
-        'APP': {
-            'client_id': LINKED_IN_CLIENT_ID,
-            'secret': LINKED_IN_CLIENT_SECRET,
-        },
-        'SCOPE': [
-            'r_liteprofile',
-            'r_emailaddress',
-            'w_member_social',
-            'offline_access',  
-        ],
-        'PROFILE_FIELDS': [
-            'id', 'first-name', 'last-name', 'email-address',
-            'picture-url', 'public-profile-url',
+    'openid_connect': {
+        'APPS': [
+            {
+                'provider_id': 'linkedin', 
+                'name': 'LinkedIn',
+                'client_id': LINKED_IN_CLIENT_ID,
+                'secret': LINKED_IN_CLIENT_SECRET,
+                'settings': {
+                    'server_url': 'https://www.linkedin.com/oauth', 
+                },
+            }
         ]
     }
 }
@@ -197,3 +194,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_LOGIN_METHODS = ['email','username'] 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True

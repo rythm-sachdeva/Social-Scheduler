@@ -29,4 +29,5 @@ urlpatterns = [
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/me/',include('poster.urls')),
     path('',include('customauth.urls')),
+    path('linkedin/',include('linkedinposter.urls')),
 ]
