@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import LinkedAccountConnectView
+from .views import linkedinCallbackView
 
 
 urlpatterns = [
-    path('connect/', LinkedAccountConnectView.as_view(), name='linkedin_connect'),
+    path('callback/', linkedinCallbackView.as_view(), name='linkedin_connect'),
 ]
