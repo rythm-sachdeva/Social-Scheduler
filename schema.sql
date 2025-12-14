@@ -49,3 +49,6 @@ CREATE INDEX "poster_schedulepost_social_account_id_382fa500" ON "poster_schedul
 CREATE TABLE IF NOT EXISTS "django_session" ("session_key" varchar(40) NOT NULL PRIMARY KEY, "session_data" text NOT NULL, "expire_date" datetime NOT NULL);
 CREATE INDEX "django_session_expire_date_a5c62663" ON "django_session" ("expire_date");
 CREATE TABLE IF NOT EXISTS "django_site" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "name" varchar(50) NOT NULL, "domain" varchar(100) NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS "poster_linkedaccounts" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "linked_at" datetime NOT NULL, "social_account_id" integer NOT NULL REFERENCES "socialaccount_socialaccount" ("id") DEFERRABLE INITIALLY DEFERRED, "user_id" integer NOT NULL REFERENCES "auth_user" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE INDEX "poster_linkedaccounts_social_account_id_a9935638" ON "poster_linkedaccounts" ("social_account_id");
+CREATE INDEX "poster_linkedaccounts_user_id_d1b36bf3" ON "poster_linkedaccounts" ("user_id");

@@ -122,17 +122,19 @@ class linkedinCallbackView(APIView):
             )
             data = social_login.account.extra_data
             # print("LinkedIn User Data:", data)
-        
+            
+            print(data)
             
             query_params = {
-                'fname': data.get('given_name', ''),
-                'lname': data.get('family_name', ''),
-                'pic': data.get('picture', ''),
-                'email': data.get('email', '')
+                'fname': data['userinfo'].get('given_name', ''),
+                'lname': data['userinfo'].get('family_name', ''),
+                'pic': data['userinfo'].get('picture', ''),
+                'email': data['userinfo'].get('email', '')
             }
             
             params_str = "&".join(f"{key}={value}" for key, value in query_params.items())
             redirect_url = f"{self.mobile_app_scheme}?{params_str}"
+            print(redirect_url)
             response = HttpResponse("", status=302)
             response['Location'] = redirect_url
             
