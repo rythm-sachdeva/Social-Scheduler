@@ -2,6 +2,8 @@ from social_scheduler.adapters import AccountAdapter
 from allauth.socialaccount.models import SocialToken, SocialAccount
 from datetime import timedelta
 from django.utils import timezone
+import requests
+
 
 
 class LinkedInAccountNotConnected(Exception):
@@ -13,9 +15,13 @@ class LinkedInAPIError(Exception):
     pass
 
 
-class LinkedINPoster(AccountAdapter):
+class LinkedInConfig(AccountAdapter):
 
+    def __init__(self,SocialAccount:SocialAccount):
+        self.social_account = SocialAccount
+        
 
+    
     def _refresh_linkedin_token(self,social_account:SocialAccount)->SocialAccount:
         """
         Refreshes the token
@@ -48,3 +54,42 @@ class LinkedINPoster(AccountAdapter):
             "X-Restli-Protocol-Version": "2.0.0",
             "LinkedIn-Version": "202305" 
         }
+    
+class PostViewLinkedIn(LinkedInConfig):
+     """
+     Class For Posting on LInkedIn
+     """
+     def __init__(self, SocialAccount:SocialAccount,PostOptions:dict):
+          super().__init__(SocialAccount)
+          self.post_options = PostOptions
+
+        def create_post(self):
+          """
+          Creates a post on LinkedIn
+          """
+          headers = self.get_headers(self.social_account)
+          post_data = {
+               "author": f"urn:li:person:{self.post_options['person_urn']}",
+               "lifecycleState": "PUBLISHED",
+               "specificContent": {
+                    "com.linkedin.ugc.ShareContent": {
+                         "shareCommentary": {
+                              "text": self.post_options['text']
+                         },
+                         "shareMediaCategory": "NONE"
+                    }
+               },
+               "visibility": {
+                    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+               }
+          }
+          # Here you would typically make an API call to LinkedIn with the headers and post_data
+          # For example:
+          # response = requests.post("https://api.linkedin.com/v2/ugcPosts", headers=headers, json=post_data)
+          # return response.json()
+          return post_data  # Placeholder return for demonstration purposes
+
+    
+     
+     
+

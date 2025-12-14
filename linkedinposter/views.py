@@ -7,9 +7,47 @@ from django.http import HttpResponse
 from allauth.socialaccount.helpers import complete_social_login
 from django.shortcuts import redirect
 from allauth.socialaccount.models import SocialApp,SocialToken,SocialAccount
+from rest_framework.permissions import IsAuthenticated
+from social_scheduler.settings import LINKED_IN_CLIENT_ID,LINKED_IN_CLIENT_SECRET
+import urllib.parse
+from poster.models import LinkedAccounts
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.tokens import AccessToken
+
 
 class LinkedINOidcAdapter(OpenIDConnectOAuth2Adapter):
     provider_id = "linkedin"
+
+
+class LinkedInLogin(APIView):
+    def get(self, request, *args, **kwargs):
+        
+        auth_token = request.GET.get('auth_token')
+        if(not auth_token):
+            return HttpResponse("Auth token missing", status=400)
+        user = None
+        try:
+            accessTokenObj = AccessToken(token=auth_token)
+            user_id = accessTokenObj['user_id']
+            print(user_id)
+            
+            user = get_user_model().objects.get(id=user_id)
+        except:
+            return HttpResponse("Invalid Access Token");
+        
+        if user is None:
+            return HttpResponse("User Does Not exist")
+
+        base_url = "https://www.linkedin.com/oauth/v2/authorization"
+        params = {
+            "response_type": "code",
+            "client_id": LINKED_IN_CLIENT_ID,
+            "redirect_uri": "https://x17hwf7f-8000.inc1.devtunnels.ms/linkedin/callback/",
+            "scope": "openid profile email w_member_social",
+            "state": f"{user.email}" }
+        auth_url = f"{base_url}?{urllib.parse.urlencode(params)}"
+        return redirect(auth_url)
+
 
 class linkedinCallbackView(APIView):
     provider_id = "linkedin"
@@ -54,16 +92,34 @@ class linkedinCallbackView(APIView):
             )
             token_response = client.get_access_token(code)
             Social_token = adapter.parse_token(token_response)
-            social_login = adapter.complete_login(request, app, Social_token , response=token_response)
+            social_login = adapter.complete_login(request, app, Social_token, response=token_response)
             complete_social_login(request, social_login)
             social_account = SocialAccount.objects.get(
                 user=request.user, 
                 provider='linkedin'
             )
 
-            Social_token.app = app
-            Social_token.account = social_account
-            Social_token.save()
+            master_user = get_user_model().objects.filter(email=state)
+            
+            if master_user.exists():
+                master_user = master_user.first()
+                LinkedAccounts.objects.get_or_create(
+                    user=master_user,
+                    social_account=social_account
+                )
+            else:
+                return HttpResponse("Master user not found.")
+            
+
+            token_obj, created = SocialToken.objects.update_or_create(
+                app=app,
+                account=social_account,
+                defaults={
+                    'token': Social_token.token,
+                    'token_secret': Social_token.token_secret,
+                    'expires_at': Social_token.expires_at,
+                }
+            )
             data = social_login.account.extra_data
             # print("LinkedIn User Data:", data)
         

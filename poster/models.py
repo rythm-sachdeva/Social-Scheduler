@@ -26,3 +26,12 @@ class SchedulePost(models.Model):
     
     class Meta:
         ordering = ['-scheduled_time']
+
+
+class LinkedAccounts(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='master_account')
+    social_account = models.ForeignKey(SocialAccount, on_delete=models.CASCADE, related_name='linked_accounts')
+    linked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.social_account.provider}"
