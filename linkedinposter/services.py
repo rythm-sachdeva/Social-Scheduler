@@ -83,11 +83,8 @@ class PostViewLinkedIn(LinkedInConfig):
                     "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
                }
           }
-          # Here you would typically make an API call to LinkedIn with the headers and post_data
-          # For example:
-          # response = requests.post("https://api.linkedin.com/v2/ugcPosts", headers=headers, json=post_data)
-          # return response.json()
-          return post_data  # Placeholder return for demonstration purposes
+          
+          return post_data  
 
     
      
