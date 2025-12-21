@@ -20,9 +20,10 @@ class SchedulePost(models.Model):
     error_message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    media_file = models.URLField(null=True, blank=True)
 
     def __str__(self):
-        return f"Post by {self.user.username} scheduled for {self.scheduled_time}"
+        return f"Post Scheduled by {self.author.username} scheduled for {self.scheduled_time}"
     
     class Meta:
         ordering = ['-scheduled_time']
