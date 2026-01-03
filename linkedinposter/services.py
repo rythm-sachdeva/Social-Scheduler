@@ -37,12 +37,6 @@ class LinkedInConfig(AccountAdapter):
                      raise LinkedInAccountNotConnected("LinkedIn Token Not Found")
                 social_app = social_account.get_provider().get_app(request=None)
 
-                
-
-
-            
-
-
     def get_headers(self,social_account:SocialAccount)->dict:
         """
         Refreshes the token if needed and returns valid API headers.
@@ -63,7 +57,7 @@ class PostViewLinkedIn(LinkedInConfig):
           super().__init__(SocialAccount)
           self.post_options = PostOptions
 
-        def create_post(self):
+     def create_post(self):
           """
           Creates a post on LinkedIn
           """
@@ -85,6 +79,7 @@ class PostViewLinkedIn(LinkedInConfig):
           }
           
           return post_data  
+     
 
     
      

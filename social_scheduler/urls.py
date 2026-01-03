@@ -31,3 +31,5 @@ urlpatterns = [
     path('',include('customauth.urls')),
     path('linkedin/',include('linkedinposter.urls')),
 ]
+
+

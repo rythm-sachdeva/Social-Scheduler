@@ -22,6 +22,9 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env.local'))
 LINKED_IN_CLIENT_ID = env('LINKEDIN_CLIENT_ID')
 LINKED_IN_CLIENT_SECRET = env('LINKEDIN_CLIENT_SECRET')
 LINKED_IN_REFERESH_TOKEN_LINK = env('LINKEDIN_REFRESH_TOKEN_LINK')
+CLOUDINDARY_NAME = env('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = env('CLOUDINARY_CLOUD_API_APP')
+CLOUDINARY_API_SECRET = env('CLOUDINARY_CLOUD_API_APP')
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +43,9 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'customauth',
+    'cloudinary_storage',
+    'django.contrib.staticfiles',
+    'cloudinary',
     'rest_framework',
     "rest_framework_simplejwt",
     'django.contrib.admin',
@@ -66,6 +72,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.0.8:8081",
     "http://localhost:8081",
 ]
+
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': CLOUDINDARY_NAME,
+    'API_KEY': CLOUDINARY_API_KEY,
+    'API_SECRET':CLOUDINARY_API_SECRET
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -195,3 +209,4 @@ ACCOUNT_LOGIN_METHODS = ['email','username']
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
