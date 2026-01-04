@@ -23,8 +23,8 @@ LINKED_IN_CLIENT_ID = env('LINKEDIN_CLIENT_ID')
 LINKED_IN_CLIENT_SECRET = env('LINKEDIN_CLIENT_SECRET')
 LINKED_IN_REFERESH_TOKEN_LINK = env('LINKEDIN_REFRESH_TOKEN_LINK')
 CLOUDINDARY_NAME = env('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY = env('CLOUDINARY_CLOUD_API_APP')
-CLOUDINARY_API_SECRET = env('CLOUDINARY_CLOUD_API_APP')
+CLOUDINARY_API_KEY = env('CLOUDINARY_CLOUD_API_KEY')
+CLOUDINARY_API_SECRET = env('CLOUDINARY_CLOUD_API_SECRET')
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

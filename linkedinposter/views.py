@@ -16,6 +16,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from poster.models import LinkedAccounts
 from rest_framework.response import Response
 from rest_framework import status
+from .serialisers import SchedulePostSerializer
 import requests
 
 class LinkedINOidcAdapter(OpenIDConnectOAuth2Adapter):
@@ -159,46 +160,14 @@ class LinkedInPostView(APIView):
             return Response(data={"detail":"No LinkedIn Account Connected"},status=status.HTTP_400_BAD_REQUEST)
         access_token = SocialToken.objects.filter(account=linkedin_Account.social_account).first()
         if not access_token:
-            return Response(data={"detail":"LinkedIn Access Token Not Found"},status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={"detail":"LinkedIn Access Not Found"},status=status.HTTP_400_BAD_REQUEST)
         
-        author_urn = f"urn:li:person:{linkedin_Account.social_account.uid}"
-        post_text  = request.data.get('content','')
-
-        if not post_text:
-            return Response(data={"detail":"Post content cannot be empty"},status=status.HTTP_400_BAD_REQUEST)
-        payload = {
-            "author": author_urn,
-            "lifecycleState": "PUBLISHED",
-            "specificContent": {
-                "com.linkedin.ugc.ShareContent": {
-                    "shareCommentary": {
-                        "text": post_text
-                    },
-                    "shareMediaCategory": "NONE"
-                }
-            },
-            "visibility": {
-                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-            }
-        }
-        headers = {
-            "Authorization": f"Bearer {access_token.token}",
-            "X-Restli-Protocol-Version": "2.0.0",
-            "LinkedIn-Version": "202305"
-        }
-        try:
-            response = requests.post(
-                "https://api.linkedin.com/v2/ugcPosts",
-                json=payload,
-                headers=headers
-            )
-            if response.status_code == 201:
-                return Response(data={"detail":"Post created Successfully"},status=status.HTTP_201_CREATED)
-            else:
-                return Response(data={"detail":"Failed to create post","error":response.json()},status=response.status_code)
-        except Exception as e:
-            return Response(data={"detail":"An error occurred while creating the post","error":str(e)},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        serializer = SchedulePostSerializer(data=request.data,context={'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
         
         

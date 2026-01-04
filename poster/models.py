@@ -17,7 +17,7 @@ class SchedulePost(models.Model):
     social_account = models.ForeignKey(SocialAccount, on_delete=models.CASCADE)
     content = models.TextField(max_length=1000)
     status = models.CharField(max_length=10,choices=Status.choices, default=Status.DRAFT)
-    scheduled_time = models.DateTimeField()
+    scheduled_time = models.DateTimeField(db_index=True)
     published_at = models.DateTimeField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,6 +27,7 @@ class SchedulePost(models.Model):
          folder="Scheduled_post",
          resource_type='auto',
          null=True, blank=True)
+    error_log = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"Post Scheduled by {self.author.username} scheduled for {self.scheduled_time}"
