@@ -15,22 +15,28 @@ def check_for_scheduled_posts():
     now = timezone.now()
 
     with transaction.atomic():
-
         post_due = SchedulePost.objects.select_for_update(skip_locked=True).filter(status=Status.SCHEDULED,scheduled_time__lte=now)
 
         for post in post_due:
-            pass
+            post.status = Status.PROCESSING
+            post.save()
+
+            publish_task.delay(post.id)
 
 
 @shared_task(bind=True,max_retries=3)
-def publish_task(self,post: SchedulePost):
+def publish_task(self,post_id: str):
     """
     Celery Task to Publish the scheduled post
     """
 
     try:
+        post = SchedulePost.objects.get(id=post_id)
+        
         poster_service = Poster(adapter=LinkedInAdapter(post))
         poster_service.post_to_social_media(post)
+        post.status = Status.PUBLISHED
+        post.save()        
     except Exception as e:
         post.status = Status.FAILED
         post.error_message = str(e)

@@ -9,9 +9,10 @@ class SchedulePostSerializer(serializers.ModelSerializer):
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     social_account_provider = serializers.CharField(source='social_account.provider', read_only=True)
-    author_username = serializers.CharField(source='author.username')
+    author_username = serializers.CharField(source='author.username',read_only=True)
     media_file = serializers.FileField(required=False)
     media_url = serializers.SerializerMethodField()
+   
     
     class Meta:
         model = SchedulePost
@@ -24,20 +25,13 @@ class SchedulePostSerializer(serializers.ModelSerializer):
             'content', 
             'media_file', 
             'status', 
-            'publish_at', 
+            'scheduled_time', 
             'created_at',
+            'media_url'
         ]
-        read_only_fields = ['id', 'author_username', 'status', 'created_at','social_accunt']
+        read_only_fields = ['id', 'author_username', 'status', 'created_at','social_account']
 
     
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        request = self.context.get('request')
-
-        if request and  hasattr(request,'user'):
-            LinkedAccounts = LinkedAccounts.objects.select_related('social_account').filter(user=request.user,social_account__provider='linkedin')
-            self.fields['social_account'] = LinkedAccounts.social_account
-        self.fields['status']= Status.SCHEDULED
                    
 
 

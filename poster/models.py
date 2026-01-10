@@ -9,6 +9,7 @@ class Status(models.TextChoices):
         SCHEDULED = 'SCHEDULED', 'Scheduled'
         PUBLISHED = 'PUBLISHED', 'Published'
         FAILED = 'FAILED', 'Failed'
+        PROCESSING = 'PROCESSING','Processing'
 
 
 class SchedulePost(models.Model):
