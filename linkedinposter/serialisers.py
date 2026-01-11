@@ -29,7 +29,7 @@ class SchedulePostSerializer(serializers.ModelSerializer):
             'created_at',
             'media_url'
         ]
-        read_only_fields = ['id', 'author_username', 'status', 'created_at','social_account']
+        read_only_fields = ['id', 'author_username', 'created_at','social_account']
 
     
                    

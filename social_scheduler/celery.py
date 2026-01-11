@@ -11,7 +11,7 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'check-scheduled-posts-every-minute': {
-        'task': 'celery.services.check_for_scheduled_posts', # Path to your task
-        'schedule': 60.0, # Run every 60 seconds
+        'task': 'poster.tasks.check_for_scheduled_posts', 
+        'schedule': 60.0, 
     },
 }

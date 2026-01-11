@@ -1,0 +1,43 @@
+#!/bin/bash 
+
+
+cleanup(){
+echo "Stoping all services..."
+kill $SERVER_PID $WORKER_PID $BEAT_PID
+exit
+}
+
+
+
+trap cleanup SIGINT
+
+CONTAINER_NAME="django_redis"
+
+if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+    echo "✅ Redis container is already running."
+else
+    if [ "$(docker ps -aq -f status=exited -f name=$CONTAINER_NAME)" ]; then
+        # Cleanup old stopped container if it exists
+        echo "♻️  Removing old stopped Redis container..."
+        docker rm $CONTAINER_NAME
+    fi
+    echo "🚀 Starting new Redis container..."
+    docker run -d --name $CONTAINER_NAME -p 6379:6379 redis
+fi
+
+
+echo "Starting Django Server.."
+python manage.py runserver & 
+SERVER_PID=$!
+
+
+echo "Starting Celery worker..."
+celery -A social_scheduler worker --loglevel=info & 
+WORKER_PID=$!
+
+
+echo "Starting Celery Beat..."
+celery -A social_scheduler beat --loglevel=info & 
+BEAT_PID=$!
+
+wait $SERVER_PID $WORKER_PID $BEAT_PID

@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'rest_framework.authtoken',
     'corsheaders',
-    'poster'
+    'poster',
+    'celery_task'
 
 ]
 CORS_ALLOWED_ORIGINS = [

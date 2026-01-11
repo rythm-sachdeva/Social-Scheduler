@@ -17,7 +17,7 @@ class LinkedInAPIError(Exception):
     pass
 
 
-class LinkedInConfig(AccountAdapter):
+class LinkedInConfig():
 
     def __init__(self,SocialAccount:SocialAccount):
         self.social_account = SocialAccount
@@ -44,9 +44,14 @@ class LinkedInConfig(AccountAdapter):
         Refreshes the token if needed and returns valid API headers.
         """
 
-        valid_token = self._refresh_linkedin_token(social_account=self.social_account)
+        
+        try:
+            social_token = SocialToken.objects.get(account=self.social_account)
+        except SocialToken.DoesNotExist:
+            raise LinkedInAPIError("Token does not exist")
+
         return {
-            "Authorization": f"Bearer {valid_token.token}",
+            "Authorization": f"Bearer {social_token.token}",
             "X-Restli-Protocol-Version": "2.0.0",
             "LinkedIn-Version": "202305" 
         }
@@ -152,7 +157,7 @@ class LinkedInAdapter(PosterABS):
             "specificContent": {
                 "com.linkedin.ugc.ShareContent": {
                     "shareCommentary": {
-                        "text": post.text
+                        "text": post.content
                     },
                     "shareMediaCategory": "NONE" if not asset_urn else "IMAGE"
                 }
