@@ -1,0 +1,62 @@
+services:
+  redis_db:
+    image: redis:7-alpine
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+      
+  web_backend:
+    build: .
+    command: gunicorn --bind 0.0.0.0:8000 --workers 3 social_scheduler.wsgi:application
+    restart: always
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles 
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.local
+    environment:
+      - REDIS_URL=redis://redis_db:6379/0
+    depends_on:
+      redis_db:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: celery -A social_scheduler worker --loglevel=info
+    restart: always 
+    env_file:
+      - .env.local
+    environment:
+      - REDIS_URL=redis://redis_db:6379/0
+    depends_on:
+      redis_db:
+        condition: service_healthy
+
+  beat:
+    build: .
+    command: celery -A social_scheduler beat --loglevel=info --schedule /app/beat/celerybeat-schedule
+    restart: always  
+    env_file:
+      - .env.local
+    environment:
+      - REDIS_URL=redis://redis_db:6379/0
+    depends_on:
+      redis_db:
+        condition: service_healthy
+    volumes:
+      - beat_schedule:/app/beat
+
+volumes:
+  redis_data:      
+  static_volume:   
+  media_volume:   
+  beat_schedule:
