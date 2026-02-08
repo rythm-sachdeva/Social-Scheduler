@@ -14,7 +14,7 @@ class Status(models.TextChoices):
 
 
 class SchedulePost(models.Model):
-    id = models.UUIDField(primary_key=True,default=uuid.uuid8,editable=False)
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='scheduled_posts')
     social_account = models.ForeignKey(SocialAccount, on_delete=models.CASCADE)
     content = models.TextField(max_length=1000)
