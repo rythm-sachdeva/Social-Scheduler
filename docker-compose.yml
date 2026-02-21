@@ -11,6 +11,14 @@ services:
       - redis_data:/data
     expose:
       - "6379"
+  postgres_db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: scheduler_db
+      POSTGRES_USER: scheduler_user
+      POSTGRES_PASSWORD: schedule123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
       
   web_backend:
     build: .
@@ -28,6 +36,8 @@ services:
     depends_on:
       redis_db:
         condition: service_healthy
+      postgres_db:
+        condition: service_started
 
   worker:
     build: .
@@ -40,6 +50,10 @@ services:
     depends_on:
       redis_db:
         condition: service_healthy
+      postgres_db:
+        condition: service_started
+      web_backend:
+        condition: service_started
 
   beat:
     build: .
@@ -52,6 +66,10 @@ services:
     depends_on:
       redis_db:
         condition: service_healthy
+      postgres_db:
+        condition: service_started
+      web_backend:
+        condition: service_started
     volumes:
       - beat_schedule:/app/beat
 
@@ -60,3 +78,4 @@ volumes:
   static_volume:   
   media_volume:   
   beat_schedule:
+  postgres_data:
