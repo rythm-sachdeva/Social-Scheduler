@@ -37,8 +37,8 @@ SECRET_KEY = 'django-insecure-m$&8(*)=)tp!0&#7str_j^x$19*!d*s+9)0yy1ieuyvypi!3^j
 DEBUG = True
 
 ALLOWED_HOSTS = []
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = env('CELERY_BROKER_URL') if env('CELERY_BROKER_URL') else 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = env('CELERY_BROKER_URL') if env('CELERY_BROKER_URL') else 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -214,4 +214,13 @@ ACCOUNT_LOGIN_METHODS = ['email','username']
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "cloudinary_storage.storage.StaticCloudinaryStorage",
+    },
+}
